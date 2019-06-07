@@ -12,10 +12,10 @@ EXTRA_DIST = get.CxxTest INSTALL.CxxTest
 pkgconfiglibdir = $(libdir)/pkgconfig
 pkgconfiglib_DATA = coincxxtest.pc
 
-# Source and header files to be installed in $(includedir)/cxxtest. Call them
-# data to evade automake's need to see a static list for code files.
+# Source and header files to be installed in $(pkgincludedir)/ThirdParty. Call
+# them data to evade automake's need to see a static list for code files.
 
-cxxincdir = $(includedir)/coin/ThirdParty/cxxtest
+cxxincdir = $(pkgincludedir)/ThirdParty
 cxxinc_DATA = $(CXXTESTHDRS)
 
 # Install cxxtestgen in the bin directory. The hook will edit it so that it
