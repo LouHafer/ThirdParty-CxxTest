@@ -1,0 +1,4 @@
+cxxtest/
+cxxtest.OLD/
+autom4te.cache/
+aclocal.m4
