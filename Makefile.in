@@ -186,7 +186,6 @@ CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CXXTESTHDRS = @CXXTESTHDRS@
 CXXTESTVER = @CXXTESTVER@
-CXXTEST_SVN_REV = @CXXTEST_SVN_REV@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
@@ -242,7 +241,6 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
-have_svnversion = @have_svnversion@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -272,23 +270,6 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
-EXTRA_DIST = get.CxxTest INSTALL.CxxTest
-
-# pkg-config data file
-pkgconfiglibdir = $(libdir)/pkgconfig
-pkgconfiglib_DATA = coincxxtest.pc
-
-# Source and header files to be installed in $(pkgincludedir)/ThirdParty. Call
-# them data to evade automake's need to see a static list for code files.
-cxxincdir = $(pkgincludedir)/ThirdParty
-cxxinc_DATA = $(CXXTESTHDRS)
-
-# Install cxxtestgen in the bin directory. The hook will edit it so that it
-# can find its modules in libdir/cxxtest/python.
-bin_SCRIPTS = cxxtest/bin/cxxtestgen
-
-# Must be set, even if empty
-DISTCLEANFILES = 
 pkgdocdir = $(docdir)
 
 # doxydocdir is the top-level directory for doxygen documentation. It holds
@@ -308,6 +289,28 @@ COIN_HAS_LATEX = @COIN_HAS_LATEX_TRUE@TRUE
 # Needless to say, it's important that baredocdir_nosub not be a target for
 # autoconf substitution.
 DOXYTAG_EDIT = sed -e 's|@baredocdir_nosub@|$(datarootdir)/doc|g'
+
+########################################################################
+#               Extra files that should be distributed                 #
+########################################################################
+EXTRA_DIST = get.CxxTest INSTALL.CxxTest
+
+########################################################################
+#               Installation                                           #
+########################################################################
+
+# Source and header files should be installed in $(pkgincludedir)/ThirdParty.
+# Call them data to evade automake's need to see a static list for code files.
+cxxincdir = $(pkgincludedir)/ThirdParty
+cxxinc_DATA = $(CXXTESTHDRS)
+pkgconfiglibdir = $(libdir)/pkgconfig
+pkgconfiglib_DATA = coincxxtest.pc
+
+# Install cxxtestgen in the bin directory. The hook will edit it so that it
+# can find its modules in libdir/cxxtest/python.
+bin_SCRIPTS = cxxtest/bin/cxxtestgen
+CLEANFILES = 
+DISTCLEANFILES = 
 all: all-am
 
 .SUFFIXES:
@@ -459,6 +462,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -559,19 +563,6 @@ uninstall-am: uninstall-binSCRIPTS uninstall-cxxincDATA \
 .PRECIOUS: Makefile
 
 
-install-exec-hook:
-	cd $(bindir) && \
-	sed -i -e "/sys.path.insert/s/os.sep/os.sep+'lib'+os.sep+'cxxtest'+os.sep/" cxxtestgen
-
-# Copy the cxxtest/python subdirectory into $(libdir)/cxxtest
-
-install-exec-local:
-	$(INSTALL) -d $(libdir)/cxxtest
-	cp -r $(srcdir)/cxxtest/python $(libdir)/cxxtest
-
-uninstall-local:
-	rm -rf $(libdir)/cxxtest
-
 doxygen-docs: 
 	if test "$(COIN_HAS_DOXYGEN)" = TRUE; then \
 	  if test -d "doxydoc/"; then \
@@ -633,13 +624,12 @@ uninstall-doxygen-docs:
 	fi
 	rmdir $(DESTDIR)$(pkgdocdir) || true
 
-install-doc: $(DocFiles)
+install-doc:
 	$(mkdir_p) "$(DESTDIR)$(pkgdocdir)"
 	for file in $(DocFiles); do \
 	  if test -f "$$file"; then dir=; else dir="$(srcdir)/"; fi; \
 	  if test -f "$$dir$$file"; then \
-	    $(INSTALL_DATA) "$$dir$$file" \
-	        "$(DESTDIR)$(pkgdocdir)/$$file"; \
+	    $(INSTALL_DATA) "$$dir$$file" "$(DESTDIR)$(pkgdocdir)/$$file"; \
 	  fi; \
 	done
 
@@ -679,6 +669,29 @@ uninstall-doc:
 .PHONY: install-doc uninstall-doc \
 	doxygen-docs pdf-doxygen-docs clean-doxygen-docs \
 	install-doxygen-docs uninstall-doxygen-docs
+
+# Add a dummy test target. Necessary to avoid apparent failure on `make test'
+
+test:
+	@echo "No test available."
+
+install-exec-hook:
+	cd $(bindir) && \
+	sed -i -e "/sys.path.insert/s/os.sep/os.sep+'lib'+os.sep+'cxxtest'+os.sep/" cxxtestgen
+
+# Copy the cxxtest/python subdirectory into $(libdir)/cxxtest
+
+install-exec-local:
+	$(INSTALL) -d $(libdir)/cxxtest
+	cp -r $(srcdir)/cxxtest/python $(libdir)/cxxtest
+
+########################################################################
+#           Extra uninstall actions                                    #
+########################################################################
+
+# Remove the cxxtest/python subdirectory from $(libdir)/cxxtest.
+uninstall-local:
+	rm -rf $(libdir)/cxxtest
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

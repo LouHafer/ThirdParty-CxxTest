@@ -6,17 +6,31 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+include BuildTools/Makemain.inc
+
+########################################################################
+#               Extra files that should be distributed                 #
+########################################################################
+
 EXTRA_DIST = get.CxxTest INSTALL.CxxTest
 
-# pkg-config data file
-pkgconfiglibdir = $(libdir)/pkgconfig
-pkgconfiglib_DATA = coincxxtest.pc
+# Add a dummy test target. Necessary to avoid apparent failure on `make test'
 
-# Source and header files to be installed in $(pkgincludedir)/ThirdParty. Call
-# them data to evade automake's need to see a static list for code files.
+test:
+	@echo "No test available."
+
+########################################################################
+#               Installation                                           #
+########################################################################
+
+# Source and header files should be installed in $(pkgincludedir)/ThirdParty.
+# Call them data to evade automake's need to see a static list for code files.
 
 cxxincdir = $(pkgincludedir)/ThirdParty
 cxxinc_DATA = $(CXXTESTHDRS)
+
+pkgconfiglibdir = $(libdir)/pkgconfig
+pkgconfiglib_DATA = coincxxtest.pc
 
 # Install cxxtestgen in the bin directory. The hook will edit it so that it
 # can find its modules in libdir/cxxtest/python.
@@ -33,12 +47,15 @@ install-exec-local:
 	$(INSTALL) -d $(libdir)/cxxtest
 	cp -r $(srcdir)/cxxtest/python $(libdir)/cxxtest
 
+########################################################################
+#           Extra uninstall actions                                    #
+########################################################################
+
+# Remove the cxxtest/python subdirectory from $(libdir)/cxxtest.
 uninstall-local:
 	rm -rf $(libdir)/cxxtest
 
-# Must be set, even if empty
+CLEANFILES =
 
 DISTCLEANFILES =
-
-include BuildTools/Makemain.inc
 
