@@ -1,7 +1,7 @@
 #!/bin/sh
 
 set -e
-cxxtest_ver=4.1
+cxxtest_ver=4.4
 
 wgetcmd=wget
 wgetcount=`which wget 2>/dev/null | wc -l`
