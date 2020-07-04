@@ -6,9 +6,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-EXTRA_DIST = get.CxxTest INSTALL.CxxTest
-
 # pkg-config data file
+
 pkgconfiglibdir = $(libdir)/pkgconfig
 pkgconfiglib_DATA = coincxxtest.pc
 
@@ -36,9 +35,12 @@ install-exec-local:
 uninstall-local:
 	rm -rf $(libdir)/cxxtest
 
+# So that there's something other than an error message.
+
+unitTest test:
+	@echo "No installation unit test provided."
+
 # Must be set, even if empty
 
 DISTCLEANFILES =
-
-include BuildTools/Makemain.inc
 
