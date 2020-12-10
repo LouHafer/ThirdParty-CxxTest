@@ -598,12 +598,14 @@ LTLIBOBJS
 LIBOBJS
 CXXTESTHDRS
 CXXTESTVER
+ADD_CXXFLAGS
 am__fastdepCXX_FALSE
 am__fastdepCXX_TRUE
 CXXDEPMODE
 ac_ct_CXX
 CXXFLAGS
 CXX
+ADD_CFLAGS
 am__fastdepCC_FALSE
 am__fastdepCC_TRUE
 CCDEPMODE
@@ -619,9 +621,8 @@ ac_ct_CC
 CPPFLAGS
 LDFLAGS
 CFLAGS
-MAINT
-MAINTAINER_MODE_FALSE
-MAINTAINER_MODE_TRUE
+COIN_RELOCATABLE_FALSE
+COIN_RELOCATABLE_TRUE
 am__untar
 am__tar
 AMTAR
@@ -645,6 +646,9 @@ am__isrc
 INSTALL_DATA
 INSTALL_SCRIPT
 INSTALL_PROGRAM
+MAINT
+MAINTAINER_MODE_FALSE
+MAINTAINER_MODE_TRUE
 AM_BACKSLASH
 AM_DEFAULT_VERBOSITY
 AM_DEFAULT_V
@@ -658,8 +662,6 @@ build_os
 build_vendor
 build_cpu
 build
-ALWAYS_FALSE_FALSE
-ALWAYS_FALSE_TRUE
 target_alias
 host_alias
 build_alias
@@ -706,6 +708,7 @@ enable_msvc
 enable_debug
 enable_silent_rules
 enable_maintainer_mode
+enable_relocatable
 enable_dependency_tracking
 '
       ac_precious_vars='build_alias
@@ -716,9 +719,11 @@ CFLAGS
 LDFLAGS
 LIBS
 CPPFLAGS
+ADD_CFLAGS
 CXX
 CXXFLAGS
-CCC'
+CCC
+ADD_CXXFLAGS'
 
 
 # Initialize some variables set by options.
@@ -1347,6 +1352,8 @@ Optional Features:
   --enable-maintainer-mode
                           enable make rules and dependencies not useful (and
                           sometimes confusing) to the casual installer
+  --enable-relocatable    whether prefix in installed .pc files should be
+                          setup relative to pcfiledir
   --enable-dependency-tracking
                           do not reject slow dependency extractors
   --disable-dependency-tracking
@@ -1360,8 +1367,11 @@ Some influential environment variables:
   LIBS        libraries to pass to the linker, e.g. -l<library>
   CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
               you have headers in a nonstandard directory <include dir>
+  ADD_CFLAGS  Additional C compiler options (if not overwriting CFLAGS)
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
+  ADD_CXXFLAGS
+              Additional C++ compiler options (if not overwriting CXXFLAGS)
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -2013,7 +2023,6 @@ fi
 
 
 
-  # We want --enable-msvc setup and checked
 
 
   # Check whether --enable-debug was given.
@@ -2024,46 +2033,34 @@ else
 fi
 
 
-# This macro should run before the compiler checks (doesn't seem to be
-# sufficient for CFLAGS)
 
 
 
 
-
-
-# change default compiler flags
-# - debugging enabled: enable debug symbols (-g/-Z7)
-# - debugging disabled: disable debug code (-DNDEBUG); enable (more) optimization (-O2)
-# - enable exceptions for (i)cl
 
   if test "$enable_debug" = yes ; then
     if test "$enable_msvc" = yes ; then
-      : ${FFLAGS:="-nologo -fpp -Z7 -MDd"}
-      : ${FCFLAGS:="-nologo -fpp -Z7 -MDd"}
-      : ${CFLAGS:="-nologo -Z7 -MDd"}
-      : ${CXXFLAGS:="-nologo -EHs -Z7 -MDd"}
-      : ${AR:="lib"}
-      : ${AR_FLAGS:="-nologo -out:"}
+      : ${FFLAGS:="-nologo -fpp -Z7 -MDd $ADD_FFLAGS"}
+      : ${FCFLAGS:="-nologo -fpp -Z7 -MDd $ADD_FCFLAGS"}
+      : ${CFLAGS:="-nologo -Z7 -MDd $ADD_CFLAGS"}
+      : ${CXXFLAGS:="-nologo -EHs -Z7 -MDd $ADD_CXXFLAGS"}
     else
-      : ${FFLAGS:="-g"}
-      : ${FCFLAGS:="-g"}
-      : ${CFLAGS:="-g"}
-      : ${CXXFLAGS:="-g"}
+      : ${FFLAGS:="-g $ADD_FFLAGS"}
+      : ${FCFLAGS:="-g $ADD_FCFLAGS"}
+      : ${CFLAGS:="-g $ADD_CFLAGS"}
+      : ${CXXFLAGS:="-g $ADD_CXXFLAGS"}
     fi
   else
     if test "$enable_msvc" = yes ; then
-      : ${FFLAGS:="-nologo -fpp -O2 -MD"}
-      : ${FCFLAGS:="-nologo -fpp -O2 -MD"}
-      : ${CFLAGS:="-nologo -DNDEBUG -O2 -MD"}
-      : ${CXXFLAGS:="-nologo -EHs -DNDEBUG -O2 -MD"}
-      : ${AR:="lib"}
-      : ${AR_FLAGS:="-nologo -out:"}
+      : ${FFLAGS:="-nologo -fpp -O2 -MD $ADD_FFLAGS"}
+      : ${FCFLAGS:="-nologo -fpp -O2 -MD $ADD_FCFLAGS"}
+      : ${CFLAGS:="-nologo -DNDEBUG -O2 -MD $ADD_CFLAGS"}
+      : ${CXXFLAGS:="-nologo -EHs -DNDEBUG -O2 -MD $ADD_CXXFLAGS"}
     else
-      : ${FFLAGS:="-O2"}
-      : ${FCFLAGS:="-O2"}
-      : ${CFLAGS:="-O2 -DNDEBUG"}
-      : ${CXXFLAGS:="-O2 -DNDEBUG"}
+      : ${FFLAGS:="-O2 $ADD_FFLAGS"}
+      : ${FCFLAGS:="-O2 $ADD_FCFLAGS"}
+      : ${CFLAGS:="-O2 -DNDEBUG $ADD_CFLAGS"}
+      : ${CXXFLAGS:="-O2 -DNDEBUG $ADD_CXXFLAGS"}
     fi
   fi
 
@@ -2526,48 +2523,43 @@ fi
 rmdir .tst 2>/dev/null
 
 
-# Enforce the required autoconf version
-
-
-
-# Set the project's version numbers
-
-
-  # break up package version number in major.minor.release
-  # AC_PACKAGE_VERSION is defined by AC_INIT
-
-
-
-
-  # ac-define AC_PACKAGE_VERSION macros, use 9999 for missing values
 
 
 
 
 
-# A useful makefile conditional that is always false
-
-   if false; then
-  ALWAYS_FALSE_TRUE=
-  ALWAYS_FALSE_FALSE='#'
-else
-  ALWAYS_FALSE_TRUE='#'
-  ALWAYS_FALSE_FALSE=
-fi
-
-
-# Change the default compiler flags. This needs to run before
-# AC_CANONICAL_BUILD.
 
 
 
-# Get the build and host types
+cat >>confdefs.h <<_ACEOF
+#define THIRDPARTYCXXTEST_VERSION "devel"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define THIRDPARTYCXXTEST_VERSION_MAJOR 9999
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define THIRDPARTYCXXTEST_VERSION_MINOR 9999
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define THIRDPARTYCXXTEST_VERSION_RELEASE 9999
+_ACEOF
 
 
 
 
-# libtool has some magic for host_os and build_os being mingw, but doesn't know about msys
 
+
+
+
+
+
+  # libtool has some magic for host_os and build_os being mingw, but doesn't know about msys
   if test $host_os = msys ; then
     host_os=mingw
     host=`echo $host | sed -e 's/msys/mingw/'`
@@ -2577,10 +2569,6 @@ fi
     build_os=mingw
     build=`echo $build | sed -e 's/msys/mingw/'`
   fi
-
-# Make silent build rules the default (https://www.gnu.org/software/automake/
-# manual/html_node/Automake-Silent-Rules.html). Run before AM_INIT_AUTOMAKE,
-# which will AC_REQUIRE it anyway.
 
   # Check whether --enable-silent-rules was given.
 if test "${enable_silent_rules+set}" = set; then :
@@ -2622,11 +2610,29 @@ fi
 AM_BACKSLASH='\'
 
 
-# Initialize automake
-# - don't AC_DEFINE PACKAGE or VERSION (but there're still defined as shell
-#   variables in configure, and as make variables).
-# - disable dist target
-# - enable all automake warnings
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable maintainer-specific portions of Makefiles" >&5
+$as_echo_n "checking whether to enable maintainer-specific portions of Makefiles... " >&6; }
+    # Check whether --enable-maintainer-mode was given.
+if test "${enable_maintainer_mode+set}" = set; then :
+  enableval=$enable_maintainer_mode; USE_MAINTAINER_MODE=$enableval
+else
+  USE_MAINTAINER_MODE=no
+fi
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $USE_MAINTAINER_MODE" >&5
+$as_echo "$USE_MAINTAINER_MODE" >&6; }
+   if test $USE_MAINTAINER_MODE = yes; then
+  MAINTAINER_MODE_TRUE=
+  MAINTAINER_MODE_FALSE='#'
+else
+  MAINTAINER_MODE_TRUE='#'
+  MAINTAINER_MODE_FALSE=
+fi
+
+  MAINT=$MAINTAINER_MODE_TRUE
+
+
 
   if test "`cd $srcdir && pwd`" != "`pwd`"; then
   # Use -I$(srcdir) only when $(srcdir) != ., so that make's output
@@ -2735,38 +2741,12 @@ END
 fi
 
 
-# Disable automatic rebuild of configure/Makefile. Use run_autotools.
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable maintainer-specific portions of Makefiles" >&5
-$as_echo_n "checking whether to enable maintainer-specific portions of Makefiles... " >&6; }
-    # Check whether --enable-maintainer-mode was given.
-if test "${enable_maintainer_mode+set}" = set; then :
-  enableval=$enable_maintainer_mode; USE_MAINTAINER_MODE=$enableval
-else
-  USE_MAINTAINER_MODE=no
-fi
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $USE_MAINTAINER_MODE" >&5
-$as_echo "$USE_MAINTAINER_MODE" >&6; }
-   if test $USE_MAINTAINER_MODE = yes; then
-  MAINTAINER_MODE_TRUE=
-  MAINTAINER_MODE_FALSE='#'
-else
-  MAINTAINER_MODE_TRUE='#'
-  MAINTAINER_MODE_FALSE=
-fi
-
-  MAINT=$MAINTAINER_MODE_TRUE
-
-
-
-# Figure out the path where libraries are installed.
-# Unless the user specifies --prefix, prefix is set to NONE until the
-# end of configuration, at which point it will be set to $ac_default_prefix.
-# Unless the user specifies --exec-prefix, exec-prefix is set to NONE until
-# the end of configuration, at which point it's set to '${prefix}'.
-# Sheesh.  So do the expansion, then back it out.
+  # Figure out the path where libraries are installed.
+  # Unless the user specifies --prefix, prefix is set to NONE until the
+  # end of configuration, at which point it will be set to $ac_default_prefix.
+  # Unless the user specifies --exec-prefix, exec-prefix is set to NONE until
+  # the end of configuration, at which point it's set to '${prefix}'.
+  # Sheesh.  So do the expansion, then back it out.
   save_prefix=$prefix
   save_exec_prefix=$exec_prefix
   if test "x$prefix" = xNONE ; then
@@ -2781,6 +2761,22 @@ fi
   done
   prefix=$save_prefix
   exec_prefix=$save_exec_prefix
+
+  # Check whether --enable-relocatable was given.
+if test "${enable_relocatable+set}" = set; then :
+  enableval=$enable_relocatable; coin_enable_relocatable=$enableval
+else
+  coin_enable_relocatable=no
+fi
+
+   if test $coin_enable_relocatable = yes; then
+  COIN_RELOCATABLE_TRUE=
+  COIN_RELOCATABLE_FALSE='#'
+else
+  COIN_RELOCATABLE_TRUE='#'
+  COIN_RELOCATABLE_FALSE=
+fi
+
 
 
 #############################################################################
@@ -2861,17 +2857,7 @@ fi
 
 
 
-  # Setting up libtool with LT_INIT will AC_REQUIRE AC_PROG_CC, but we want
-  # to invoke it from this macro first so that we can supply a parameter.
 
-
-  # If enable-msvc, then test for Intel (on Windows) and MS C compiler
-  # explicitly and add the compile wrapper before AC_PROG_CC. The compile
-  # wrapper works around issues related to finding MS link.exe. (Unix link.exe
-  # occurs first in PATH, which causes compile and link checks to fail.) For
-  # the same reason, set LD to use the compile wrapper. If CC remains unset
-  # (neither icl or cl was found, and CC was not set by the user), stop with
-  # an error.
 
   if test $enable_msvc = yes ; then
     for ac_prog in icl cl
@@ -2920,15 +2906,11 @@ done
       CC="$am_aux_dir/compile $CC"
       ac_cv_prog_CC="$CC"
       LD="$CC"
+      : ${AR:=lib}
     else
       as_fn_error $? "Neither MS nor Intel C compiler found in PATH and CC is unset." "$LINENO" 5
     fi
   fi
-
-  # Look for some C compiler and check that it works. If the user has set CC
-  # or we found icl/cl above, this shouldn't overwrite CC. Unlike the macros
-  # that establish C++ or Fortran compilers, PROG_CC also takes care of adding
-  # the compile wrapper if needed.
 
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3719,13 +3701,7 @@ fi
 
 
 
-  # If enable-msvc, then test for Intel (on Windows) and MS C compiler
-  # explicitly and add the compile wrapper before AC_PROG_CXX. The compile
-  # wrapper works around issues related to finding MS link.exe. (Unix link.exe
-  # occurs first in PATH, which causes compile and link checks to fail.) For
-  # the same reason, set LD to use the compile wrapper. If CC remains unset
-  # (neither icl or cl was found, and CC was not set by the user), stop with
-  # an error.
+
 
   if test $enable_msvc = yes ; then
     for ac_prog in icl cl
@@ -3774,13 +3750,11 @@ done
       CXX="$am_aux_dir/compile $CXX"
       ac_cv_prog_CXX="$CXX"
       LD="$CXX"
+      : ${AR:=lib}
     else
       as_fn_error $? "Neither MS nor Intel C++ compiler found in PATH and CXX is unset." "$LINENO" 5
     fi
   fi
-
-  # Look for some C++ compiler and check that it works. If the user has set
-  # CXX or we found icl/cl above, this shouldn't overwrite CXX.
 
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -4168,8 +4142,6 @@ fi
 
 
 
-  # If the compiler does not support -c -o, wrap it with the compile script.
-
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -4238,6 +4210,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   if test $ac_cv_prog_cxx_c_o = no ; then
     CXX="$am_aux_dir/compile $CXX"
   fi
+
+
 
 
 ###########################################################################
@@ -4411,8 +4385,8 @@ LIBOBJS=$ac_libobjs
 LTLIBOBJS=$ac_ltlibobjs
 
 
-if test -z "${ALWAYS_FALSE_TRUE}" && test -z "${ALWAYS_FALSE_FALSE}"; then
-  as_fn_error $? "conditional \"ALWAYS_FALSE\" was never defined.
+if test -z "${MAINTAINER_MODE_TRUE}" && test -z "${MAINTAINER_MODE_FALSE}"; then
+  as_fn_error $? "conditional \"MAINTAINER_MODE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking that generated files are newer than configure" >&5
@@ -4431,8 +4405,8 @@ else
   am__EXEEXT_FALSE=
 fi
 
-if test -z "${MAINTAINER_MODE_TRUE}" && test -z "${MAINTAINER_MODE_FALSE}"; then
-  as_fn_error $? "conditional \"MAINTAINER_MODE\" was never defined.
+if test -z "${COIN_RELOCATABLE_TRUE}" && test -z "${COIN_RELOCATABLE_FALSE}"; then
+  as_fn_error $? "conditional \"COIN_RELOCATABLE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${AMDEP_TRUE}" && test -z "${AMDEP_FALSE}"; then
@@ -5535,7 +5509,9 @@ $as_echo X/"$am_mf" |
     { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error $? "Something went wrong bootstrapping makefile fragments
-    for automatic dependency tracking.  Try re-running configure with the
+    for automatic dependency tracking.  If GNU make was not used, consider
+    re-running the configure script with MAKE=\"gmake\" (or whatever is
+    necessary).  You can also try re-running configure with the
     '--disable-dependency-tracking' option to at least be able to build
     the package (albeit without support for automatic dependency tracking).
 See \`config.log' for more details" "$LINENO" 5; }
@@ -5586,7 +5562,6 @@ $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
 
-  #AC_MSG_NOTICE([In case of trouble, first consult the troubleshooting page at https://projects.coin-or.org/BuildTools/wiki/user-troubleshooting])
   { $as_echo "$as_me:${as_lineno-$LINENO}: Configuration of $PACKAGE_NAME successful" >&5
 $as_echo "$as_me: Configuration of $PACKAGE_NAME successful" >&6;}
 
