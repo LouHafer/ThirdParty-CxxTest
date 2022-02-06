@@ -6,7 +6,7 @@
 #                       Names and other basic things                        #
 #############################################################################
 
-AC_INIT([ThirdPartyCxxTest],[devel],
+AC_INIT([ThirdPartyCxxTest],[4.4],
 	[https://github.com/coin-or-tools/ThirdParty-CxxTest/issues/new],
 	[thirdpartycxxtest],
 	[https://github.com/coin-or-tools/ThirdParty-CxxTest/])
@@ -34,7 +34,7 @@ AC_COIN_INITIALIZE
 # benefit from some configuration, but it's never compiled on its own. All
 # of the various bits of source here are used to compose custom test code
 # for the unit under test. I'm going to leave these checks in place during
-# development. It may be possible to remove some of the at a later date.
+# development. It may be possible to remove some of them at a later date.
 # -- lh, 130216 --
 
 # Get the name of the C++ compiler and appropriate compiler options.
